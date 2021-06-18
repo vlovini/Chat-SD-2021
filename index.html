@@ -32,17 +32,20 @@
       form.addEventListener('submit', function(e) {
         e.preventDefault();
         if (input.value) {
-          socket.emit('masBah', input.value);
+          socket.emit('mensagem', input.value);
           input.value = '';
         }
       });
 
-      socket.on('masBah', function(msg) {
+      console.log("TEST");
+      socket.on('broadcastMessage', function(mensagem) {
+        console.log({mensagem});
         var item = document.createElement('li');
-        item.textContent = msg;
+        item.textContent = mensagem.text;
         messages.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
       });
+
     </script>
   </body>
 </html>

@@ -8,8 +8,8 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-  socket.on('masBah', msg => {
-    io.emit('masBah', "Test");
+  socket.on('broadcastMessage', msg => {
+    io.emit('broadcastMessage', msg);
   });
 });
 
