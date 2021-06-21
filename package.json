@@ -6,9 +6,15 @@
     "express": "^4.17.1",
     "moment": "^2.29.1",
     "path": "^0.12.7",
+    "qs": "^6.10.1",
     "socket.io": "^3.0.3"
   },
+  "author": "vinicius-lora-fernanda-schafer",
+  "license": "MIT",
   "scripts": {
     "start": "node server.js"
+  },
+  "engines": {
+    "node": "12.x"
   }
 }

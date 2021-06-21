@@ -1,9 +1,10 @@
 const moment = require('moment');
 
-function formatMessage(user, text) {
+function formatMessage(user, text, base64Photo) {
   return {
-    user,
-    text,
+    user: user ? user : '',
+    text: text ? text : '',
+    photo: base64Photo ? base64Photo : undefined,
     time: moment().format('h:mm a')
   };
 }

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <style>
+      
+      body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+      #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
+      #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
+      #input:focus { outline: none; }
+      #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
+
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages > li { padding: 0.5rem 1rem; }
+      #messages > li:nth-child(odd) { background: #efefef; }
+    </style>
+  </head>
+  <body>
+    <ul id="messages"></ul>
+    <form id="form" action="">
+      <input id="input" autocomplete="off" />
+      <button>Enviar</button>
+      <input id="attachment" type="file" />​
+    </form>
+    <script src="https://cdn.bootcss.com/qs/6.7.0/qs.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+      const messages = document.getElementById('messages');
+      const form = document.getElementById('form');
+      const input = document.getElementById('input');
+      const attachment = document.getElementById('attachment');
+      const fileReader = new FileReader();
+
+      function clearInputs() {
+        attachment.value = '';
+        input.value = '';
+      }
+
+      function populateMessageElementHeader(user, time) {
+        let messageHeader = document.createElement('li');
+        let messageHeaderContent = document.createElement('h6');
+        messageHeaderContent.textContent = `${user} - ${time}`;
+        messageHeader.appendChild(messageHeaderContent)
+        return messageHeader;
+      }
+
+      function populateMessageContent(text) {
+        let messageContent= document.createElement('li');
+        messageContent.textContent = text;
+        return messageContent;
+      }
+
+      function populateMessagePhoto(photo) {
+        const messagePhoto = document.createElement('li');
+        const photoContent = document.createElement('img');
+        photoContent.src = photo;
+        photoContent.style = style="height:350px";
+        messagePhoto.appendChild(photoContent);
+        return messagePhoto;
+      }
+
+      const { userId } = Qs.parse(location.search, {
+        ignoreQueryPrefix: true,
+      });
+
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (attachment.value) {
+          const base64Image = fileReader.result;
+          socket.emit('attachmentMessage', base64Image, input.value, userId);
+          clearInputs();
+        } else if (input.value) {
+          socket.emit('mensagem', input.value, userId);
+          clearInputs();
+        }
+      });
+
+      attachment.addEventListener('change', (event) => {
+        const photo = event.target.files[0];
+        fileReader.readAsDataURL(photo);
+      });
+
+      socket.on('broadcastMessage', function(message) {
+        let photo;
+        let messageElement = document.createElement('li');
+        const messageHeader = populateMessageElementHeader(message.user, message.time);
+        const messageContent = populateMessageContent(message.text);
+        messageElement.appendChild(messageHeader);
+        messageElement.appendChild(messageContent);
+        if(message.photo){
+          messageElement.appendChild(populateMessagePhoto(message.photo));
+        }
+        messages.appendChild(messageElement);
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+
+    </script>
+  </body>
+</html>
