@@ -12,12 +12,10 @@ app.use(express.static(path.join(__dirname, 'content')));
 
 io.on('connection', socket => {
   socket.on('mensagem', (text, userId) => {
-    console.log({userId});
     io.emit('broadcastMessage', messages(userId, text));
   });
 
   socket.on('attachmentMessage', (base64Photo, text, userId) => {
-    console.log({text});
     io.emit('broadcastMessage', messages(userId, text, base64Photo));
   });
 });
